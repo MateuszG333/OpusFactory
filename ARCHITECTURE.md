@@ -1,0 +1,13 @@
+Simulation
+    ↓
+Grid
+    ↓
+Atoms
+    ↓
+Arms
+    ↓
+Tracks
+    ↓
+Glyphs
+    ↓
+Output

@@ -1,0 +1,16 @@
+*.rbxl
+*.rbxlx
+*.rbxm
+
+.env
+
+node_modules/
+
+Packages/
+
+build/
+
+*.log
+
+.DS_Store
+Thumbs.db

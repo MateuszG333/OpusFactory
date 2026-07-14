@@ -35,23 +35,23 @@ type PieceDef = {
 }
 
 local COLORS = {
-	background = Color3.fromRGB(24, 24, 26),
-	woodDark = Color3.fromRGB(38, 38, 41),
-	wood = Color3.fromRGB(52, 52, 56),
-	woodLight = Color3.fromRGB(66, 66, 71),
-	brassDark = Color3.fromRGB(70, 68, 62),
-	brass = Color3.fromRGB(108, 102, 88),
-	gold = Color3.fromRGB(140, 132, 112),
-	goldSoft = Color3.fromRGB(160, 152, 132),
-	ink = Color3.fromRGB(24, 24, 26),
-	text = Color3.fromRGB(214, 212, 206),
-	textDim = Color3.fromRGB(150, 148, 144),
-	greenGlass = Color3.fromRGB(88, 128, 100),
-	blueSteel = Color3.fromRGB(88, 112, 132),
-	redWax = Color3.fromRGB(140, 78, 70),
-	slotEmpty = Color3.fromRGB(44, 44, 48),
-	slotFilled = Color3.fromRGB(70, 70, 76),
-	rowLabel = Color3.fromRGB(54, 54, 58),
+	background = Color3.fromRGB(15, 14, 12), -- Głęboki, prawie czarny mat
+	woodDark = Color3.fromRGB(28, 24, 20),   -- Bardzo ciemne, hebanowe drewno
+	wood = Color3.fromRGB(43, 37, 32),       -- Ciepły orzech
+	woodLight = Color3.fromRGB(59, 51, 44),  -- Jaśniejsze drewno podświetleń
+	brassDark = Color3.fromRGB(82, 70, 51),  -- Stary, patynowany mosiądz
+	brass = Color3.fromRGB(138, 118, 87),    -- Klasyczny szczotkowany mosiądz
+	gold = Color3.fromRGB(186, 158, 112),    -- Jasne, alchemiczne złoto
+	goldSoft = Color3.fromRGB(214, 190, 150),-- Delikatne, kremowe złoto do tekstów
+	ink = Color3.fromRGB(18, 17, 15),        -- Głęboki, czysty atrament
+	text = Color3.fromRGB(235, 232, 223),    -- Przełamana biel pergaminu
+	textDim = Color3.fromRGB(158, 152, 139), -- Wygaszony tekst/napisy techniczne
+	greenGlass = Color3.fromRGB(62, 115, 87),-- Szmaragdowe szkło instrumentów
+	blueSteel = Color3.fromRGB(67, 98, 122), -- Oksydowana na niebiesko stal
+	redWax = Color3.fromRGB(153, 56, 46),    -- Szkarłatny wosk pieczęci
+	slotEmpty = Color3.fromRGB(26, 24, 22),  -- Wgłębienie w stole mechanicznym
+	slotFilled = Color3.fromRGB(54, 46, 38), -- Zapełniony slot mechanizmu
+	rowLabel = Color3.fromRGB(36, 31, 26),   -- Ciemniejsze tło rzędów
 }
 
 -- === Layout constants (design resolution 1920x1080) ===
@@ -63,6 +63,7 @@ local PARTS_WIDTH = 240
 local LEVEL_WIDGET_W = 180
 local LEVEL_WIDGET_H = 120
 local COMMAND_HEIGHT = 230
+local PARTS_HEIGHT = 1040
 
 local PIECES: { PieceDef } = {
 	{ name = "Arm", description = "Move and rotate atoms." },
@@ -226,8 +227,8 @@ local function createControls(parent: Instance, onCenterCamera: (() -> ())?)
 	local panel = createPanel(
 		parent,
 		"TopControlsPanel",
-		UDim2.new(1, -MARGIN * 2, 0, TOP_HEIGHT),
-		UDim2.new(0, MARGIN, 0, TOP_Y)
+		UDim2.new(0, 530, 0, TOP_HEIGHT),
+		UDim2.new(0.5, -265, 0, TOP_Y)
 	)
 	createPadding(panel, 6, 6, 12, 12)
 
@@ -426,13 +427,83 @@ local function createCycleHeader(parent: Instance, cycleIndex: number)
 	label.Parent = parent
 end
 
-local function createPiecePalette(parent: Instance)
+local ARM_VARIANTS = {
+	{ variant = "Arm", label = "Arm (1)" },
+	{ variant = "DoubleArm", label = "Double (2)" },
+	{ variant = "TripleArm", label = "Triple (3)" },
+	{ variant = "HexArm", label = "Hex (6)" },
+}
+
+local function createArmVariantPopup(parent: Instance, anchorButton: TextButton, onPick: (string) -> ())
+	local existing = anchorButton:FindFirstChild("ArmVariantPopup")
+	if existing then
+		existing:Destroy()
+		return
+	end
+
+	local popup = Instance.new("Frame")
+	popup.Name = "ArmVariantPopup"
+	popup.Size = UDim2.new(0, 160, 0, 4 * 60 + 16)
+	popup.Position = UDim2.new(0, anchorButton.AbsoluteSize.X + 8, 0, 0)
+	popup.BackgroundColor3 = COLORS.woodDark
+	popup.BorderSizePixel = 0
+	popup.ZIndex = 50
+	popup.Parent = anchorButton
+
+	createCorner(popup, 8)
+	createStroke(popup, COLORS.brassDark, 1)
+	createPadding(popup, 8, 8, 8, 8)
+
+	local layout = Instance.new("UIListLayout")
+	layout.Padding = UDim.new(0, 6)
+	layout.Parent = popup
+
+	for _, entry in ipairs(ARM_VARIANTS) do
+		local optionButton = Instance.new("TextButton")
+		optionButton.Size = UDim2.new(1, 0, 0, 54)
+		optionButton.BackgroundColor3 = COLORS.wood
+		optionButton.BorderSizePixel = 0
+		optionButton.Text = ""
+		optionButton.ZIndex = 51
+		optionButton.Parent = popup
+
+		createCorner(optionButton, 6)
+		createStroke(optionButton, COLORS.brassDark, 1)
+
+		local iconHolder = Instance.new("Frame")
+		iconHolder.Size = UDim2.new(0, 40, 0, 40)
+		iconHolder.Position = UDim2.new(0, 6, 0.5, -20)
+		iconHolder.BackgroundTransparency = 1
+		iconHolder.ZIndex = 51
+		iconHolder.Parent = optionButton
+
+		PieceIcons.create("Arm", iconHolder, entry.variant)
+
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(1, -54, 1, 0)
+		label.Position = UDim2.new(0, 50, 0, 0)
+		label.BackgroundTransparency = 1
+		label.Text = entry.label
+		label.TextColor3 = COLORS.text
+		label.Font = Enum.Font.GothamBold
+		label.TextSize = 12
+		label.ZIndex = 51
+		label.Parent = optionButton
+
+		optionButton.MouseButton1Click:Connect(function()
+			onPick(entry.variant)
+			popup:Destroy()
+		end)
+	end
+end
+
+local function createPiecePalette(parent: Instance, onPieceSelected: ((string, string?) -> ())?)
 	local panel = createPanel(
-	parent,
-	"PiecePalette",
-	UDim2.new(0, PARTS_WIDTH, 1, -(TOP_Y + TOP_HEIGHT + GAP + COMMAND_HEIGHT + GAP + MARGIN)),
-	UDim2.new(0, MARGIN, 0, TOP_Y + TOP_HEIGHT + GAP)
-)
+		parent,
+		"PiecePalette",
+		UDim2.new(0, PARTS_WIDTH, 0, PARTS_HEIGHT),
+		UDim2.new(0, MARGIN, 1, -(PARTS_HEIGHT + MARGIN))
+	)
 	createPadding(panel, 8, 8, 6, 6)
 
 	local layout = Instance.new("UIListLayout")
@@ -441,10 +512,12 @@ local function createPiecePalette(parent: Instance)
 	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	layout.Parent = panel
 
+	local selectedArmVariant = "Arm"
+
 	for _, piece in ipairs(PIECES) do
 		local button = Instance.new("TextButton")
 		button.Name = piece.name .. "Button"
-		button.Size = UDim2.new(1, 0, 0, 64)
+		button.Size = UDim2.new(1, 0, 0, 110)
 		button.BackgroundColor3 = COLORS.woodDark
 		button.BorderSizePixel = 0
 		button.Text = ""
@@ -455,20 +528,26 @@ local function createPiecePalette(parent: Instance)
 
 		local iconHolder = Instance.new("Frame")
 		iconHolder.Name = "Icon"
-		iconHolder.Size = UDim2.new(1, -10, 1, -10)
-		iconHolder.Position = UDim2.new(0, 5, 0, 5)
+		iconHolder.Size = UDim2.new(1, -16, 1, -34)
+		iconHolder.Position = UDim2.new(0, 8, 0, 6)
 		iconHolder.BackgroundTransparency = 1
 		iconHolder.Parent = button
 
-		PieceIcons.create(piece.name, iconHolder)
+		if piece.name == "Arm" then
+			PieceIcons.create("Arm", iconHolder, selectedArmVariant)
+		else
+			PieceIcons.create(piece.name, iconHolder)
+		end
+
 		local label = Instance.new("TextLabel")
-		label.Size = UDim2.new(1, 0, 0, 16)
-		label.Position = UDim2.new(0, 0, 1, -18)
+		label.Name = "Label"
+		label.Size = UDim2.new(1, 0, 0, 20)
+		label.Position = UDim2.new(0, 0, 1, -24)
 		label.BackgroundTransparency = 1
 		label.Text = piece.name
 		label.TextColor3 = COLORS.text
 		label.Font = Enum.Font.GothamBold
-		label.TextSize = 11
+		label.TextSize = 12
 		label.Parent = button
 
 		button.MouseEnter:Connect(function()
@@ -478,10 +557,38 @@ local function createPiecePalette(parent: Instance)
 		button.MouseLeave:Connect(function()
 			button.BackgroundColor3 = COLORS.woodDark
 		end)
+
+		if piece.name == "Arm" then
+			button.MouseButton1Click:Connect(function()
+				createArmVariantPopup(panel, button, function(variant: string)
+					selectedArmVariant = variant
+					for _, child in ipairs(iconHolder:GetChildren()) do
+						child:Destroy()
+					end
+					PieceIcons.create("Arm", iconHolder, selectedArmVariant)
+					label.Text = variant
+
+					if onPieceSelected then
+						onPieceSelected("Arm", variant)
+					end
+				end)
+			end)
+		else
+			button.MouseButton1Click:Connect(function()
+				if onPieceSelected then
+					onPieceSelected(piece.name, nil)
+				end
+			end)
+		end
 	end
 end
 
-function HUD.build(puzzle: PuzzleLike, onBack: (() -> ())?, onCenterCamera: (() -> ())?): (ScreenGui, any)
+function HUD.build(
+	puzzle: PuzzleLike,
+	onBack: (() -> ())?,
+	onCenterCamera: (() -> ())?,
+	onPieceSelected: ((string, string?) -> ())?
+): (ScreenGui, any)
 	local screenGui = Instance.new("ScreenGui")
 	screenGui.Name = "OpusFactoryHUD"
 	screenGui.ResetOnSpawn = false
@@ -494,11 +601,15 @@ function HUD.build(puzzle: PuzzleLike, onBack: (() -> ())?, onCenterCamera: (() 
 	createLevelWidget(screenGui, puzzle)
 	createBackButton(screenGui, onBack)
 	local cycleController = CommandCycle.build(screenGui)
-	createPiecePalette(screenGui)
+	createPiecePalette(screenGui, onPieceSelected)
 
 	-- na razie: dodaj jedno ramię od razu, żeby tabela nie była pusta
 	-- (docelowo to zniknie - ramiona pojawią się dopiero gdy gracz je postawi na planszy)
-	cycleController.addArm()
+	-- TYMCZASOWO: kilka ramion na start, żeby przetestować scroll pionowy
+	-- (docelowo wróci do jednego/zera - ramiona pojawią się gdy gracz je postawi na planszy)
+	for _ = 1, 8 do
+		cycleController.addArm()
+	end
 
 	return screenGui, cycleController
 end

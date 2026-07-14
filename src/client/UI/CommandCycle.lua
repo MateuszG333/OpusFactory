@@ -5,22 +5,24 @@
 -- especially with UIScale from ResponsiveScaler affecting on-screen pixel sizes.
 
 local COLORS = {
-	woodDark = Color3.fromRGB(45, 30, 20),
-	wood = Color3.fromRGB(72, 47, 30),
-	woodLight = Color3.fromRGB(94, 64, 39),
-	brassDark = Color3.fromRGB(116, 82, 35),
-	brass = Color3.fromRGB(178, 132, 58),
-	goldSoft = Color3.fromRGB(238, 204, 130),
-	ink = Color3.fromRGB(30, 24, 18),
-	text = Color3.fromRGB(238, 226, 202),
-	textDim = Color3.fromRGB(184, 166, 132),
-	greenGlass = Color3.fromRGB(88, 145, 105),
-	blueSteel = Color3.fromRGB(92, 133, 160),
-	redWax = Color3.fromRGB(145, 56, 46),
-	slotEmpty = Color3.fromRGB(56, 39, 26),
-	slotFilled = Color3.fromRGB(90, 63, 38),
-	rowLabel = Color3.fromRGB(62, 42, 27),
-	selectedGlow = Color3.fromRGB(255, 235, 180),
+	background = Color3.fromRGB(15, 14, 12), -- Głęboki, prawie czarny mat
+	woodDark = Color3.fromRGB(28, 24, 20),   -- Bardzo ciemne, hebanowe drewno
+	wood = Color3.fromRGB(43, 37, 32),       -- Ciepły orzech
+	woodLight = Color3.fromRGB(59, 51, 44),  -- Jaśniejsze drewno podświetleń
+	brassDark = Color3.fromRGB(82, 70, 51),  -- Stary, patynowany mosiądz
+	brass = Color3.fromRGB(138, 118, 87),    -- Klasyczny szczotkowany mosiądz
+	gold = Color3.fromRGB(186, 158, 112),    -- Jasne, alchemiczne złoto
+	goldSoft = Color3.fromRGB(214, 190, 150),-- Delikatne, kremowe złoto do tekstów
+	ink = Color3.fromRGB(18, 17, 15),        -- Głęboki, czysty atrament
+	text = Color3.fromRGB(235, 232, 223),    -- Przełamana biel
+	textDim = Color3.fromRGB(158, 152, 139), -- Wygaszony tekst
+	greenGlass = Color3.fromRGB(62, 115, 87),-- Szmaragdowe szkło
+	blueSteel = Color3.fromRGB(67, 98, 122), -- Oksydowana stal
+	redWax = Color3.fromRGB(153, 56, 46),    -- Szkarłatny wosk
+	slotEmpty = Color3.fromRGB(26, 24, 22),  -- Wgłębienie
+	slotFilled = Color3.fromRGB(54, 46, 38), -- Zapełniony slot
+	rowLabel = Color3.fromRGB(36, 31, 26),   -- Ciemniejsze tło rzędów
+	selectedGlow = Color3.fromRGB(214, 190, 150), -- Złoty glow wyboru
 }
 
 export type InstructionDef = {
@@ -78,8 +80,8 @@ function CommandCycle.build(parent: Instance): any
 
 	local panel = Instance.new("Frame")
 	panel.Name = "CommandCyclePanel"
-	panel.Size = UDim2.new(1, -(MARGIN + PARTS_WIDTH + GAP + MARGIN), 0, COMMAND_HEIGHT)
-	panel.Position = UDim2.new(0, MARGIN + PARTS_WIDTH + GAP, 1, -(COMMAND_HEIGHT + MARGIN))
+	panel.Size = UDim2.new(1, -(MARGIN + PARTS_WIDTH + MARGIN), 0, COMMAND_HEIGHT)
+	panel.Position = UDim2.new(0, MARGIN + PARTS_WIDTH, 1, -(COMMAND_HEIGHT + MARGIN))
 	panel.BackgroundColor3 = COLORS.woodDark
 	panel.BorderSizePixel = 0
 	panel.Parent = parent

@@ -9,6 +9,7 @@ local HUD = require(script.Parent.UI.HUD)
 
 local BoardController = require(script.Parent.BoardController)
 local CameraController = require(script.Parent.CameraController)
+local PlacementController = require(script.Parent.PlacementController)
 
 local PuzzleDefinitions = require(ReplicatedStorage.Shared.Puzzles.PuzzleDefinitions)
 
@@ -17,6 +18,7 @@ local levelSelectGui: ScreenGui? = nil
 local hudGui: ScreenGui? = nil
 
 local function destroyHud()
+	PlacementController.stop()
 	if hudGui then
 		hudGui:Destroy()
 		hudGui = nil
@@ -61,14 +63,21 @@ local function showLevelSelect()
 		CameraController.enableZoom()
 		CameraController.enablePan()
 
-		hudGui = HUD.build(puzzle, function()
+		PlacementController.begin(puzzle)
+
+		local cycleController
+		hudGui, cycleController = HUD.build(puzzle, function()
 			destroyHud()
 			BoardController.clear()
 			CameraController.resetToDefault()
 			showLevelSelect()
 		end, function()
 			CameraController.centerOnBoard()
+		end, function(pieceType: string, variant: string?)
+			PlacementController.selectPieceType(pieceType, variant)
 		end)
+
+		PlacementController.setCycleController(cycleController)
 
 		print("[Client] Puzzle board loaded.")
 	end, function()

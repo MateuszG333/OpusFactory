@@ -127,19 +127,13 @@ local function createHexTile(coord: HexCoord, parent: Instance, index: number): 
 	part.Shape = Enum.PartType.Cylinder
 	part.Material = Enum.Material.SmoothPlastic
 	part.Color = if index % 2 == 0 then COLORS.hexDark else COLORS.hexLight
-	part.Size = Vector3.new(HEX_HEIGHT, HEX_SIZE * 1.62, HEX_SIZE * 1.62)
+	-- Płaski cylinder jako stabilny heksagon
+	part.Size = Vector3.new(HEX_HEIGHT, HEX_SIZE * 1.7, HEX_SIZE * 1.7)
 
 	local worldPos = coord:toWorldPosition(HEX_SIZE)
+	-- Obrót o 90 stopni, aby leżał płasko
 	part.CFrame = CFrame.new(worldPos + Vector3.new(0, 0.12, 0)) * CFrame.Angles(0, 0, math.rad(90))
 	part.Parent = parent
-
-	local selection = Instance.new("SelectionBox")
-	selection.Name = "BrassEdge"
-	selection.Adornee = part
-	selection.LineThickness = 0.025
-	selection.Color3 = COLORS.hexBorder
-	selection.SurfaceTransparency = 1
-	selection.Parent = part
 
 	return part
 end
@@ -300,5 +294,7 @@ end
 function BoardController.clear()
 	clearBoardFolder()
 end
+
+
 
 return BoardController

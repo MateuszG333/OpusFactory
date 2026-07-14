@@ -45,7 +45,8 @@ local function getCamera(): Camera?
 end
 
 local function getDefaultHeight(radius: number): number
-	return math.clamp(100 + radius * 8, MIN_HEIGHT, MAX_HEIGHT)
+	-- Obniżona wysokość bazowa, aby kamera po centrowaniu była bliżej planszy
+	return math.clamp(75 + radius * 6, MIN_HEIGHT, MAX_HEIGHT)
 end
 
 local function applyCamera()
@@ -83,7 +84,8 @@ function CameraController.focusOnBoard(radius: number)
 end
 
 function CameraController.centerOnBoard()
-	currentHeight = getDefaultHeight(currentRadius)
+	-- Przybliżenie dwukrotne: bierzemy bazową wysokość i dzielimy przez 2
+	currentHeight = math.clamp(getDefaultHeight(currentRadius) / 2, MIN_HEIGHT, MAX_HEIGHT)
 	applyCamera()
 end
 

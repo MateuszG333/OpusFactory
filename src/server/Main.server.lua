@@ -1,9 +1,6 @@
 --!strict
-print("[Client] Rojo sync działa po stronie klienta!")
+-- Main.server.lua
+-- Server bootstrap for OpusFactory.
+-- Gameplay sessions, validation, and persistence will be initialized here as those systems are added.
 
-local Players = game:GetService("Players")
-local HUD = require(script.Parent.UI.HUD)
-
-HUD.build()
-
-print("[Client] HUD zbudowany")
+print("[Server] OpusFactory server bootstrap loaded")

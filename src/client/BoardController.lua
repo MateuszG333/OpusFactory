@@ -26,7 +26,7 @@ local HEX_HEIGHT = 0.35
 
 -- Visual board is intentionally larger than the puzzle logic radius.
 -- This gives the player enough building space while we are still prototyping placement.
-local MIN_VISUAL_RADIUS = 18
+local MIN_VISUAL_RADIUS = 30
 local VISUAL_BOARD_MARGIN = 8
 
 local COLORS = {

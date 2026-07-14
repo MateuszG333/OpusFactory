@@ -59,6 +59,7 @@ local function showLevelSelect()
 		local visualRadius = math.max(18, puzzle.gridRadius + 8)
 		CameraController.focusOnBoard(visualRadius)
 		CameraController.enableZoom()
+		CameraController.enablePan()
 
 		hudGui = HUD.build(puzzle, function()
 			destroyHud()

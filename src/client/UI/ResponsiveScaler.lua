@@ -7,8 +7,8 @@ local Workspace = game:GetService("Workspace")
 
 local ResponsiveScaler = {}
 
-local DESIGN_WIDTH = 1280
-local DESIGN_HEIGHT = 720
+local DESIGN_WIDTH = 1920
+local DESIGN_HEIGHT = 1080
 
 local MIN_SCALE = 0.62
 local MAX_SCALE = 1.05

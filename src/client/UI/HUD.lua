@@ -35,24 +35,34 @@ type PieceDef = {
 }
 
 local COLORS = {
-	background = Color3.fromRGB(20, 17, 14),
-	woodDark = Color3.fromRGB(45, 30, 20),
-	wood = Color3.fromRGB(72, 47, 30),
-	woodLight = Color3.fromRGB(94, 64, 39),
-	brassDark = Color3.fromRGB(116, 82, 35),
-	brass = Color3.fromRGB(178, 132, 58),
-	gold = Color3.fromRGB(224, 178, 82),
-	goldSoft = Color3.fromRGB(238, 204, 130),
-	ink = Color3.fromRGB(30, 24, 18),
-	text = Color3.fromRGB(238, 226, 202),
-	textDim = Color3.fromRGB(184, 166, 132),
-	greenGlass = Color3.fromRGB(88, 145, 105),
-	blueSteel = Color3.fromRGB(92, 133, 160),
-	redWax = Color3.fromRGB(145, 56, 46),
-	slotEmpty = Color3.fromRGB(56, 39, 26),
-	slotFilled = Color3.fromRGB(90, 63, 38),
-	rowLabel = Color3.fromRGB(62, 42, 27),
+	background = Color3.fromRGB(24, 24, 26),
+	woodDark = Color3.fromRGB(38, 38, 41),
+	wood = Color3.fromRGB(52, 52, 56),
+	woodLight = Color3.fromRGB(66, 66, 71),
+	brassDark = Color3.fromRGB(70, 68, 62),
+	brass = Color3.fromRGB(108, 102, 88),
+	gold = Color3.fromRGB(140, 132, 112),
+	goldSoft = Color3.fromRGB(160, 152, 132),
+	ink = Color3.fromRGB(24, 24, 26),
+	text = Color3.fromRGB(214, 212, 206),
+	textDim = Color3.fromRGB(150, 148, 144),
+	greenGlass = Color3.fromRGB(88, 128, 100),
+	blueSteel = Color3.fromRGB(88, 112, 132),
+	redWax = Color3.fromRGB(140, 78, 70),
+	slotEmpty = Color3.fromRGB(44, 44, 48),
+	slotFilled = Color3.fromRGB(70, 70, 76),
+	rowLabel = Color3.fromRGB(54, 54, 58),
 }
+
+-- === Layout constants (design resolution 1920x1080) ===
+local MARGIN = 16
+local GAP = 12
+local TOP_Y = 20
+local TOP_HEIGHT = 52
+local PARTS_WIDTH = 240
+local LEVEL_WIDGET_W = 180
+local LEVEL_WIDGET_H = 120
+local COMMAND_HEIGHT = 230
 
 local PIECES: { PieceDef } = {
 	{ name = "Arm", description = "Move and rotate atoms." },
@@ -107,18 +117,18 @@ local function createPanel(parent: Instance, name: string, size: UDim2, position
 	outer.BorderSizePixel = 0
 	outer.Parent = parent
 
-	createCorner(outer, 14)
-	createStroke(outer, COLORS.brassDark, 2)
+	createCorner(outer, 8)
+	createStroke(outer, COLORS.brassDark, 1)
 
 	local inner = Instance.new("Frame")
 	inner.Name = "Inner"
-	inner.Size = UDim2.new(1, -12, 1, -12)
-	inner.Position = UDim2.new(0, 6, 0, 6)
+	inner.Size = UDim2.new(1, -8, 1, -8)
+	inner.Position = UDim2.new(0, 4, 0, 4)
 	inner.BackgroundColor3 = COLORS.wood
 	inner.BorderSizePixel = 0
 	inner.Parent = outer
 
-	createCorner(inner, 10)
+	createCorner(inner, 6)
 
 	return inner
 end
@@ -164,87 +174,62 @@ local function createBackButton(parent: Instance, onBack: (() -> ())?)
 	end)
 end
 
-local function createTopInfo(parent: Instance, puzzle: PuzzleLike)
-	local panel = createPanel(parent, "PuzzleInfoPanel", UDim2.new(0, 300, 0, 64), UDim2.new(0, 24, 0, 20))
-	createPadding(panel, 8, 8, 14, 14)
+local function createLevelWidget(parent: Instance, puzzle: PuzzleLike)
+	local panel = createPanel(
+		parent,
+		"LevelWidget",
+		UDim2.new(0, LEVEL_WIDGET_W, 0, LEVEL_WIDGET_H),
+		UDim2.new(1, -(MARGIN + LEVEL_WIDGET_W), 0, TOP_Y + TOP_HEIGHT + GAP)
+	)
+	createPadding(panel, 8, 8, 10, 10)
 
 	local title = Instance.new("TextLabel")
 	title.Name = "PuzzleTitle"
-	title.Size = UDim2.new(1, 0, 0, 24)
+	title.Size = UDim2.new(1, 0, 0, 20)
 	title.BackgroundTransparency = 1
 	title.Text = string.format("%02d  %s", puzzle.id, puzzle.name)
-	title.TextColor3 = COLORS.goldSoft
-	title.Font = Enum.Font.Garamond
-	title.TextSize = 22
+	title.TextColor3 = COLORS.text
+	title.Font = Enum.Font.GothamBold
+	title.TextSize = 13
 	title.TextXAlignment = Enum.TextXAlignment.Left
+	title.TextTruncate = Enum.TextTruncate.AtEnd
 	title.Parent = panel
 
 	local meta = Instance.new("TextLabel")
 	meta.Name = "PuzzleMeta"
 	meta.Size = UDim2.new(1, 0, 0, 16)
-	meta.Position = UDim2.new(0, 0, 0, 26)
+	meta.Position = UDim2.new(0, 0, 0, 22)
 	meta.BackgroundTransparency = 1
-	meta.Text = string.format("%s · Radius %d", puzzle.difficulty, puzzle.gridRadius)
+	meta.Text = puzzle.difficulty .. "  ·  R" .. puzzle.gridRadius
 	meta.TextColor3 = COLORS.textDim
 	meta.Font = Enum.Font.Gotham
-	meta.TextSize = 12
+	meta.TextSize = 11
 	meta.TextXAlignment = Enum.TextXAlignment.Left
 	meta.Parent = panel
-end
 
-local function createHintPanel(parent: Instance, puzzle: PuzzleLike)
-	local button = Instance.new("TextButton")
-	button.Name = "HintToggle"
-	button.Size = UDim2.new(0, 40, 0, 40)
-	button.Position = UDim2.new(1, -64, 0, 24)
-	button.BackgroundColor3 = COLORS.brass
-	button.BorderSizePixel = 0
-	button.Text = "?"
-	button.TextColor3 = COLORS.ink
-	button.Font = Enum.Font.GothamBold
-	button.TextSize = 18
-	button.Parent = parent
-
-	createCorner(button, 999)
-	createStroke(button, COLORS.goldSoft, 1)
-
-	local panel = createPanel(parent, "HintPanel", UDim2.new(0, 320, 0, 138), UDim2.new(1, -344, 0, 72))
-	createPadding(panel, 14, 14, 16, 16)
-	panel.Parent.Visible = false
-
-	local title = Instance.new("TextLabel")
-	title.Name = "HintTitle"
-	title.Size = UDim2.new(1, 0, 0, 28)
-	title.BackgroundTransparency = 1
-	title.Text = "Workshop Hint"
-	title.TextColor3 = COLORS.goldSoft
-	title.Font = Enum.Font.Garamond
-	title.TextSize = 24
-	title.TextXAlignment = Enum.TextXAlignment.Left
-	title.Parent = panel
-
-	local body = Instance.new("TextLabel")
-	body.Name = "HintBody"
-	body.Size = UDim2.new(1, 0, 1, -36)
-	body.Position = UDim2.new(0, 0, 0, 36)
-	body.BackgroundTransparency = 1
-	body.Text = puzzle.description
-	body.TextColor3 = COLORS.textDim
-	body.Font = Enum.Font.Gotham
-	body.TextSize = 13
-	body.TextWrapped = true
-	body.TextXAlignment = Enum.TextXAlignment.Left
-	body.TextYAlignment = Enum.TextYAlignment.Top
-	body.Parent = panel
-
-	button.MouseButton1Click:Connect(function()
-		panel.Parent.Visible = not panel.Parent.Visible
-	end)
+	local descriptionLabel = Instance.new("TextLabel")
+	descriptionLabel.Name = "Description"
+	descriptionLabel.Size = UDim2.new(1, 0, 1, -46)
+	descriptionLabel.Position = UDim2.new(0, 0, 0, 44)
+	descriptionLabel.BackgroundTransparency = 1
+	descriptionLabel.Text = puzzle.description
+	descriptionLabel.TextColor3 = COLORS.textDim
+	descriptionLabel.Font = Enum.Font.Gotham
+	descriptionLabel.TextSize = 10
+	descriptionLabel.TextWrapped = true
+	descriptionLabel.TextXAlignment = Enum.TextXAlignment.Left
+	descriptionLabel.TextYAlignment = Enum.TextYAlignment.Top
+	descriptionLabel.Parent = panel
 end
 
 local function createControls(parent: Instance, onCenterCamera: (() -> ())?)
-	local panel = createPanel(parent, "ControlsPanel", UDim2.new(0, 560, 0, 64), UDim2.new(0.5, -280, 0, 20))
-	createPadding(panel, 10, 10, 12, 12)
+	local panel = createPanel(
+		parent,
+		"TopControlsPanel",
+		UDim2.new(1, -MARGIN * 2, 0, TOP_HEIGHT),
+		UDim2.new(0, MARGIN, 0, TOP_Y)
+	)
+	createPadding(panel, 6, 6, 12, 12)
 
 	local layout = Instance.new("UIListLayout")
 	layout.FillDirection = Enum.FillDirection.Horizontal
@@ -442,7 +427,12 @@ local function createCycleHeader(parent: Instance, cycleIndex: number)
 end
 
 local function createPiecePalette(parent: Instance)
-	local panel = createPanel(parent, "PiecePalette", UDim2.new(0, 76, 1, -180), UDim2.new(0, 12, 0, 90))
+	local panel = createPanel(
+	parent,
+	"PiecePalette",
+	UDim2.new(0, PARTS_WIDTH, 1, -(TOP_Y + TOP_HEIGHT + GAP + COMMAND_HEIGHT + GAP + MARGIN)),
+	UDim2.new(0, MARGIN, 0, TOP_Y + TOP_HEIGHT + GAP)
+)
 	createPadding(panel, 8, 8, 6, 6)
 
 	local layout = Instance.new("UIListLayout")
@@ -454,7 +444,7 @@ local function createPiecePalette(parent: Instance)
 	for _, piece in ipairs(PIECES) do
 		local button = Instance.new("TextButton")
 		button.Name = piece.name .. "Button"
-		button.Size = UDim2.new(0, 58, 0, 58)
+		button.Size = UDim2.new(1, 0, 0, 64)
 		button.BackgroundColor3 = COLORS.woodDark
 		button.BorderSizePixel = 0
 		button.Text = ""
@@ -471,6 +461,15 @@ local function createPiecePalette(parent: Instance)
 		iconHolder.Parent = button
 
 		PieceIcons.create(piece.name, iconHolder)
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(1, 0, 0, 16)
+		label.Position = UDim2.new(0, 0, 1, -18)
+		label.BackgroundTransparency = 1
+		label.Text = piece.name
+		label.TextColor3 = COLORS.text
+		label.Font = Enum.Font.GothamBold
+		label.TextSize = 11
+		label.Parent = button
 
 		button.MouseEnter:Connect(function()
 			button.BackgroundColor3 = COLORS.woodLight
@@ -491,10 +490,9 @@ function HUD.build(puzzle: PuzzleLike, onBack: (() -> ())?, onCenterCamera: (() 
 
 	ResponsiveScaler.attach(screenGui)
 
-	createTopInfo(screenGui, puzzle)
-	createHintPanel(screenGui, puzzle)
-	createBackButton(screenGui, onBack)
 	createControls(screenGui, onCenterCamera)
+	createLevelWidget(screenGui, puzzle)
+	createBackButton(screenGui, onBack)
 	local cycleController = CommandCycle.build(screenGui)
 	createPiecePalette(screenGui)
 

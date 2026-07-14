@@ -71,16 +71,21 @@ end
 
 -- Builds the panel. Returns a controller: addArm(), getProgram(), getArmCount().
 function CommandCycle.build(parent: Instance): any
+	local MARGIN = 16
+	local GAP = 12
+	local PARTS_WIDTH = 240
+	local COMMAND_HEIGHT = 230
+
 	local panel = Instance.new("Frame")
 	panel.Name = "CommandCyclePanel"
-	panel.Size = UDim2.new(1, -110, 0, 210)
-	panel.Position = UDim2.new(0, 98, 1, -222)
+	panel.Size = UDim2.new(1, -(MARGIN + PARTS_WIDTH + GAP + MARGIN), 0, COMMAND_HEIGHT)
+	panel.Position = UDim2.new(0, MARGIN + PARTS_WIDTH + GAP, 1, -(COMMAND_HEIGHT + MARGIN))
 	panel.BackgroundColor3 = COLORS.woodDark
 	panel.BorderSizePixel = 0
 	panel.Parent = parent
 
-	createCorner(panel, 14)
-	createStroke(panel, COLORS.brassDark, 2)
+	createCorner(panel, 8)
+	createStroke(panel, COLORS.brassDark, 1)
 
 	local inner = Instance.new("Frame")
 	inner.Name = "Inner"
@@ -90,7 +95,7 @@ function CommandCycle.build(parent: Instance): any
 	inner.BorderSizePixel = 0
 	inner.Parent = panel
 
-	createCorner(inner, 10)
+	createCorner(inner, 6)
 	createPadding(inner, 8, 8, 12, 12)
 
 	-- === Selection state ===
